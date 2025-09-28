@@ -81,6 +81,7 @@ import { Card, CardService } from '../services/card.service';
             <button
               *ngFor="let num of passengerOptions"
               type="button"
+              style="display: flex;align-items: center;justify-content: center;"
               class="aspect-square p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all font-medium flex items-center justify-center"
               [class.border-blue-500]="useForm.get('passengers')?.value === num"
               [class.bg-blue-50]="useForm.get('passengers')?.value === num"
@@ -92,7 +93,7 @@ import { Card, CardService } from '../services/card.service';
           </div>
 
           <!-- Input personalizado -->
-          <div class="space-y-2">
+          <!-- <div class="space-y-2">
             <br>
             <label class="block text-sm font-medium text-gray-700">
               Número personalizado (máximo 10)
@@ -118,7 +119,7 @@ import { Card, CardService } from '../services/card.service';
                 Máximo 10 pasajeros
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Calculadora de costo -->
