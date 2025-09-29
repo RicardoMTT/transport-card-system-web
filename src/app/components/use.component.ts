@@ -123,17 +123,17 @@ import { Card, CardService } from '../services/card.service';
         </div>
 
         <!-- Calculadora de costo -->
-        <div *ngIf="getSelectedCard() && useForm.get('passengers')?.value" class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <!-- <div *ngIf="getSelectedCard() && useForm.get('passengers')?.value" class="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Cálculo del viaje</h3>
 
           <div class="space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Tarjeta:</span>
-              <span class="font-medium">{{ getSelectedCard()?.name }}</span>
+              <span class="font-medium">{{ getSelectedCard()?.type }}</span>
             </div>
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Tarifa por persona:</span>
-              <span class="font-medium">S/ {{ getSelectedCard()?.farePrice?.toFixed(2) }}</span>
+              <span class="font-medium">S/ {{ getSelectedCard()?.fare?.toFixed(2) }}</span>
             </div>
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Número de pasajeros:</span>
@@ -157,20 +157,20 @@ import { Card, CardService } from '../services/card.service';
                 S/ {{ getRemainingBalance().toFixed(2) }}
               </span>
             </div>
-          </div>
+          </div> -->
 
           <!-- Advertencia de saldo bajo -->
-          <div *ngIf="getRemainingBalance() < 5" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <!-- <div *ngIf="getRemainingBalance() < 5" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div class="flex items-center space-x-2">
               <span class="text-yellow-600">⚠️</span>
               <span class="text-yellow-800 text-sm font-medium">
                 Advertencia: Tu saldo quedará bajo después de este viaje
               </span>
             </div>
-          </div>
+          </div> -->
 
           <!-- Error de saldo insuficiente -->
-          <div *ngIf="!canAffordTrip()" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <!-- <div *ngIf="!canAffordTrip()" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
             <div class="flex items-center space-x-2">
               <span class="text-red-600">❌</span>
               <span class="text-red-800 text-sm font-medium">
@@ -178,7 +178,7 @@ import { Card, CardService } from '../services/card.service';
               </span>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Botones de acción -->
         <div class="flex space-x-4">
@@ -250,7 +250,10 @@ export class UseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.cardService.getCards().subscribe({
+    this.getCards();
+  }
+getCards() {
+  this.cardService.getCards().subscribe({
       next: (cards) => {
         console.log(cards);
         this.cards = cards;
@@ -259,15 +262,15 @@ export class UseComponent implements OnInit {
         console.error('Error fetching cards:', err);
       }
     })
-  }
-
+}
   selectPassengers(num: number) {
     this.useForm.patchValue({ passengers: num });
   }
 
   getSelectedCard(): any | undefined {
     const selectedCardId = this.useForm.get('selectedCard')?.value;
-    return this.cardService.getCardById(selectedCardId);
+    console.log(selectedCardId);
+    return this.cards?.find((card: any) => card.id === selectedCardId);
   }
 
   canUseCard(card: any): boolean {
@@ -311,10 +314,15 @@ export class UseComponent implements OnInit {
       this.cardService.usagesCard(selectedCardId, body).subscribe({
         next: (response) => {
           console.log('Viaje registrado exitosamente:', response);
-            this.resetForm();
+
+            this.lastTransactionAmount = this.getTotalCost();
+            console.log(this.lastTransactionAmount);
            this.showSuccess = true;
+           this.getCards();
+            this.isProcessing = false;
             setTimeout(() => {
             this.showSuccess = false;
+             this.resetForm();
           }, 3000);
         },
         error: (error) => {

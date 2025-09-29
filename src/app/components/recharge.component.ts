@@ -114,7 +114,7 @@ import { Observable } from 'rxjs';
         </div>
 
         <!-- Resumen -->
-        <div *ngIf="getSelectedCard()" class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <!-- <div *ngIf="getSelectedCard()" class="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Resumen de la recarga</h3>
 
           <div class="space-y-3 text-sm">
@@ -137,7 +137,7 @@ import { Observable } from 'rxjs';
               </span>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Botón de envío -->
         <div class="flex space-x-4">
@@ -162,13 +162,21 @@ import { Observable } from 'rxjs';
 
       <!-- Mensaje de éxito -->
       <div *ngIf="showSuccess" class="max-w-2xl mx-auto">
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
-          <div class="text-green-600 text-xl">✅</div>
-          <div>
-            <p class="text-green-800 font-medium">¡Recarga exitosa!</p>
-            <p class="text-green-700 text-sm">Tu tarjeta ha sido recargada correctamente.</p>
-          </div>
-        </div>
+
+  <div *ngIf="showTooltip" class="absolute z-50 bg-green-50 border border-green-200 rounded-lg p-4">
+    <div class="flex items-center space-x-3">
+      <div class="text-green-600 text-xl animate-checkmark">
+        <span class="checkmark">&#10003;</span>
+      </div>
+      <div>
+        <p class="text-green-800 font-medium">¡Recarga exitosa!</p>
+        <p class="text-green-700 text-sm">Tu tarjeta ha sido recargada correctamente.</p>
+      </div>
+    </div>
+    <div class="mt-4">
+      <button class="bg-green-700 text-white px-4 py-2 rounded-md" (click)="showTooltip = false">Cerrar</button>
+    </div>
+  </div>
       </div>
     </div>
   `
@@ -180,7 +188,7 @@ export class RechargeComponent implements OnInit {
   predefinedAmounts = [10, 20, 30, 50];
   isProcessing = false;
   showSuccess = false;
-
+  showTooltip = true;
   constructor(
     private cardService: CardService,
     private fb: FormBuilder
@@ -194,7 +202,11 @@ export class RechargeComponent implements OnInit {
   }
 
   ngOnInit() {
-     this.cardService.getCards().subscribe({
+     this.getCards();
+  }
+
+  getCards() {
+    this.cardService.getCards().subscribe({
       next: (cards) => {
         console.log(cards);
         this.cards = cards;
@@ -204,14 +216,13 @@ export class RechargeComponent implements OnInit {
       }
     })
   }
-
   selectAmount(amount: number) {
     this.rechargeForm.patchValue({ amount });
   }
 
   getSelectedCard(): Card | undefined {
     const selectedCardId = this.rechargeForm.get('selectedCard')?.value;
-    return this.cardService.getCardById(selectedCardId);
+    return this.cards.find((card: Card) => card.id === selectedCardId);
   }
 
   onSubmit() {
@@ -232,6 +243,7 @@ export class RechargeComponent implements OnInit {
             this.isProcessing = false;
             this.showSuccess = true;
             this.resetForm();
+            this.getCards();
             setTimeout(() => {
               this.showSuccess = false;
             }, 3000);

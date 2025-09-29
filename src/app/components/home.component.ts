@@ -72,7 +72,7 @@ import { Observable } from 'rxjs';
       <!-- Selected Card Details -->
       <div *ngIf="selectedCard" class="card-details-panel">
         <div class="panel-header">
-          <h3 class="panel-title">Detalles de {{ selectedCard.name }}</h3>
+          <h3 class="panel-title">Detalles de {{ selectedCard.type }}</h3>
           <button class="close-btn" (click)="selectedCard = null">×</button>
         </div>
 
@@ -86,14 +86,14 @@ import { Observable } from 'rxjs';
           <div class="stat-card stat-card--fare">
             <div class="stat-icon">🎫</div>
             <p class="stat-label">Tarifa</p>
-            <p class="stat-value">S/ {{ selectedCard.farePrice.toFixed(2) }}</p>
+            <p class="stat-value">S/ {{ selectedCard.fare.toFixed(2) }}</p>
           </div>
 
-          <div class="stat-card stat-card--trips">
+          <!-- <div class="stat-card stat-card--trips">
             <div class="stat-icon">🚇</div>
             <p class="stat-label">Viajes Disponibles</p>
             <p class="stat-value">{{ getTripsAvailable(selectedCard) }}</p>
-          </div>
+          </div> -->
         </div>
 
         <div class="action-buttons">
@@ -144,7 +144,7 @@ import { Observable } from 'rxjs';
 export class HomeComponent implements OnInit {
   cards$: Observable<Card[]>;
   cards:any;
-  selectedCard: Card | null = null;
+  selectedCard: any | null = null;
 
   constructor(
     private cardService: CardService,
