@@ -1,8 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Card, CardService } from '../services/card.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-use',
@@ -15,23 +22,26 @@ import { Card, CardService } from '../services/card.service';
         <p class="text-gray-600">Registra tu viaje y el número de pasajeros</p>
       </div>
 
-      <form [formGroup]="useForm" (ngSubmit)="onSubmit()" class="max-w-2xl mx-auto">
+      <form
+        [formGroup]="useForm"
+        (ngSubmit)="onSubmit()"
+        class="max-w-2xl mx-auto"
+      >
         <!-- Selección de tarjeta -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h3 class="text-lg font-semibold text-gray-800 mb-4">Selecciona tu tarjeta</h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            Selecciona tu tarjeta
+          </h3>
 
           <div class="grid gap-4 md:grid-cols-2">
-            <div
-              *ngFor="let card of cards"
-              class="relative"
-            >
+            <div *ngFor="let card of cards" class="relative">
               <input
                 type="radio"
                 [id]="'card-' + card.id"
                 [value]="card.id"
                 formControlName="selectedCard"
                 class="sr-only peer"
-              >
+              />
               <label
                 [for]="'card-' + card.id"
                 class="flex items-center p-4 bg-gray-50 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-100 peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all"
@@ -66,15 +76,19 @@ import { Card, CardService } from '../services/card.service';
             </div>
           </div>
 
-          <div *ngIf="useForm.get('selectedCard')?.errors?.['required'] && useForm.get('selectedCard')?.touched"
-               class="text-red-600 text-sm mt-2">
+          <div
+            *ngIf="useForm.get('selectedCard')?.errors?.['required'] && useForm.get('selectedCard')?.touched"
+            class="text-red-600 text-sm mt-2"
+          >
             Por favor selecciona una tarjeta
           </div>
         </div>
 
         <!-- Número de pasajeros -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h3 class="text-lg font-semibold text-gray-800 mb-4">¿Cuántas personas van a viajar?</h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            ¿Cuántas personas van a viajar?
+          </h3>
 
           <!-- Selector visual de pasajeros -->
           <div class="grid grid-cols-4 md:grid-cols-8 gap-3 mb-4">
@@ -159,8 +173,8 @@ import { Card, CardService } from '../services/card.service';
             </div>
           </div> -->
 
-          <!-- Advertencia de saldo bajo -->
-          <!-- <div *ngIf="getRemainingBalance() < 5" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <!-- Advertencia de saldo bajo -->
+        <!-- <div *ngIf="getRemainingBalance() < 5" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div class="flex items-center space-x-2">
               <span class="text-yellow-600">⚠️</span>
               <span class="text-yellow-800 text-sm font-medium">
@@ -169,8 +183,8 @@ import { Card, CardService } from '../services/card.service';
             </div>
           </div> -->
 
-          <!-- Error de saldo insuficiente -->
-          <!-- <div *ngIf="!canAffordTrip()" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <!-- Error de saldo insuficiente -->
+        <!-- <div *ngIf="!canAffordTrip()" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
             <div class="flex items-center space-x-2">
               <span class="text-red-600">❌</span>
               <span class="text-red-800 text-sm font-medium">
@@ -200,69 +214,49 @@ import { Card, CardService } from '../services/card.service';
           </button>
         </div>
       </form>
-
-      <!-- Mensaje de éxito -->
-      <div *ngIf="showSuccess" class="max-w-2xl mx-auto">
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
-          <div class="text-green-600 text-xl">✅</div>
-          <div>
-            <p class="text-green-800 font-medium">¡Viaje registrado exitosamente!</p>
-            <p class="text-green-700 text-sm">Se ha descontado S/ {{ lastTransactionAmount.toFixed(2) }} de tu tarjeta.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mensaje de error -->
-      <div *ngIf="showError" class="max-w-2xl mx-auto">
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-3">
-          <div class="text-red-600 text-xl">❌</div>
-          <div>
-            <p class="text-red-800 font-medium">Error al procesar el viaje</p>
-            <p class="text-red-700 text-sm">{{ errorMessage }}</p>
-          </div>
-        </div>
-      </div>
     </div>
   `,
-  styles: []
+  styles: [],
 })
 export class UseComponent implements OnInit {
   cards$: Observable<Card[]>;
   useForm: FormGroup;
   passengerOptions = [1, 2, 3, 4, 5, 6, 7, 8];
   isProcessing = false;
-  showSuccess = false;
-  showError = false;
   errorMessage = '';
   lastTransactionAmount = 0;
   cards: any;
 
   constructor(
     private cardService: CardService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private toastr: ToastrService
   ) {
     this.cards$ = this.cardService.cards$;
 
     this.useForm = this.fb.group({
       selectedCard: ['', Validators.required],
-      passengers: [1, [Validators.required, Validators.min(1), Validators.max(10)]]
+      passengers: [
+        1,
+        [Validators.required, Validators.min(1), Validators.max(10)],
+      ],
     });
   }
 
   ngOnInit() {
     this.getCards();
   }
-getCards() {
-  this.cardService.getCards().subscribe({
+  getCards() {
+    this.cardService.getCards().subscribe({
       next: (cards) => {
         console.log(cards);
         this.cards = cards;
       },
       error: (err) => {
         console.error('Error fetching cards:', err);
-      }
-    })
-}
+      },
+    });
+  }
   selectPassengers(num: number) {
     this.useForm.patchValue({ passengers: num });
   }
@@ -303,70 +297,40 @@ getCards() {
   onSubmit() {
     if (this.useForm.valid && this.canAffordTrip()) {
       this.isProcessing = true;
-      this.showError = false;
 
       const selectedCardId = this.useForm.get('selectedCard')?.value;
       const passengers = this.useForm.get('passengers')?.value;
 
-      const body={
-        passengers: passengers
-      }
+      const body = {
+        passengers: passengers,
+      };
       this.cardService.usagesCard(selectedCardId, body).subscribe({
         next: (response) => {
           console.log('Viaje registrado exitosamente:', response);
 
-            this.lastTransactionAmount = this.getTotalCost();
-            console.log(this.lastTransactionAmount);
-           this.showSuccess = true;
-           this.getCards();
-            this.isProcessing = false;
-            setTimeout(() => {
-            this.showSuccess = false;
-             this.resetForm();
-          }, 3000);
+          this.lastTransactionAmount = this.getTotalCost();
+          console.log(this.lastTransactionAmount);
+          this.getCards();
+          this.isProcessing = false;
+          this.toastr.success(
+            `Tu tarjeta ha sido usada correctamente. Monto descontado: S/ ${this.lastTransactionAmount.toFixed(
+              2
+            )}`,
+            '¡Viaje registrado!'
+          );
         },
         error: (error) => {
           console.error('Error en el registro del viaje:', error);
-          this.showError = true;
           this.errorMessage = 'Saldo insuficiente para completar el viaje';
-
-          // Ocultar mensaje de error después de 3 segundos
-          setTimeout(() => {
-            this.showError = false;
-          }, 3000);
-        }
+          this.toastr.error(this.errorMessage, 'Error al registrar el viaje');
+        },
       });
-
-      // Simular procesamiento
-      // setTimeout(() => {
-      //   const success = this.cardService.useCard(selectedCardId, passengers);
-      //   this.isProcessing = false;
-
-      //   if (success) {
-      //     this.lastTransactionAmount = this.getTotalCost();
-      //     this.showSuccess = true;
-      //     this.resetForm();
-
-      //     // Ocultar mensaje de éxito después de 3 segundos
-      //     setTimeout(() => {
-      //       this.showSuccess = false;
-      //     }, 3000);
-      //   } else {
-      //     this.showError = true;
-      //     this.errorMessage = 'Saldo insuficiente para completar el viaje';
-
-      //     // Ocultar mensaje de error después de 3 segundos
-      //     setTimeout(() => {
-      //       this.showError = false;
-      //     }, 3000);
-      //   }
-      // }, 1000);
     }
   }
 
   resetForm() {
     this.useForm.reset({
-      passengers: 1
+      passengers: 1,
     });
   }
 }
