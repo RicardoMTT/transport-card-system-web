@@ -4,22 +4,33 @@ export const routes: Routes = [
   {
     path: '',
     redirectTo: '/home',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'home',
-    loadComponent: () => import('./components/home.component').then(m => m.HomeComponent)
+    loadComponent: () =>
+      import('./components/home.component').then((m) => m.HomeComponent),
   },
   {
     path: 'recharge',
-    loadComponent: () => import('./components/recharge.component').then(m => m.RechargeComponent)
+    loadComponent: () =>
+      import('./components/recharge.component').then(
+        (m) => m.RechargeComponent
+      ),
   },
   {
     path: 'use',
-    loadComponent: () => import('./components/use.component').then(m => m.UseComponent)
+    loadComponent: () =>
+      import('./components/use.component').then((m) => m.UseComponent),
+  },
+
+  {
+    path: 'history/:id',
+    loadComponent: () =>
+      import('./components/history.component').then((m) => m.HistoryComponent),
   },
   {
     path: '**',
-    redirectTo: '/home'
-  }
+    redirectTo: '/home',
+  },
 ];

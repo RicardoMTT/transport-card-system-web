@@ -167,7 +167,10 @@ export class HomeComponent implements OnInit {
   }
 
   selectCard(card: Card) {
-    this.selectedCard = this.selectedCard?.id === card.id ? null : card;
+    // this.selectedCard = this.selectedCard?.id === card.id ? null : card;
+    console.log(card.id);
+
+    this.router.navigate(['/history', card.id]);
   }
 
   trackByCardId(index: number, card: Card): string {

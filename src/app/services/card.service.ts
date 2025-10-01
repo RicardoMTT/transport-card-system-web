@@ -52,6 +52,11 @@ export class CardService {
   usagesCard(cardId: string, body:any) {
     return this.http.post<any[]>(`https://transport-card-system-api-1.onrender.com/api/cards/${cardId}/usages`,body);
   }
+
+  getHistory(cardId: any) {
+    return this.http.get<any[]>(`https://transport-card-system-api-1.onrender.com/api/cards/${cardId}/history`);
+  }
+
   rechargeCard(cardId: string, amount: number): void {
     const cards = this.cardsSubject.value;
     const cardIndex = cards.findIndex(card => card.id === cardId);
