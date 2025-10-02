@@ -30,7 +30,8 @@
                 "glob": "**/*",
                 "input": "public"
               },
-              "src/_redirects"
+              "src/_redirects",
+              "staticwebapp.config.json"
             ],
             "styles": [
               "src/styles.scss",
